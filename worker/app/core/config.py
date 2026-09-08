@@ -10,9 +10,13 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
     )
 
-    cors_origins: list[str] = Field(
+    celery_broker_url: str = Field(
         ...,
-        validation_alias="CORS_ORIGINS",
+        validation_alias="CELERY_BROKER_URL",
+    )
+    celery_result_backend: str = Field(
+        ...,
+        validation_alias="CELERY_RESULT_BACKEND",
     )
 
     s3_bucket_name: str = Field(

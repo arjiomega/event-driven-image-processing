@@ -1,0 +1,12 @@
+[project]
+name = "events"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "celery>=5.6.3",
+    "pika>=1.4.4",
+    "pydantic>=2.13.5",
+    "pydantic-settings>=2.15.0",
+]
