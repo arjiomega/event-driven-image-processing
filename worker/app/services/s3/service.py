@@ -1,3 +1,4 @@
+import io
 from datetime import timedelta
 
 from minio import Minio, S3Error
@@ -70,24 +71,14 @@ class S3Service:
 
     def generate_presigned_download_url(
         self,
-        bucket_name: str,
         storage_key: str,
         expiration_minutes: int = 60,
-    ) -> str | None:
-        bucket_name = (
-            bucket_name if bucket_name else self.storage_configuration.S3_BUCKET_NAME
-        )
-        try:
-            self.__validate_object_existance(
-                s3_object_path=storage_key,
-                bucket_name=bucket_name,
-            )
-        except S3ObjectDoesntExistException:
-            return None
+    ) -> str:
+        self.__validate_object_existance(s3_object_path=storage_key)
 
         try:
             return self.minio_client.presigned_get_object(
-                bucket_name=bucket_name,
+                bucket_name=self.storage_configuration.S3_BUCKET_NAME,
                 object_name=storage_key,
                 expires=timedelta(minutes=expiration_minutes),
             )
