@@ -1,3 +1,4 @@
+import time
 from pathlib import Path
 
 import cv2
@@ -12,6 +13,8 @@ EXTENSION_CONTENT_TYPES = {
     ".png": "image/png",
     ".webp": "image/webp",
 }
+
+PROCESSING_DELAY_SECONDS = 5
 
 
 @celery_app.task(
@@ -29,6 +32,8 @@ def process_image(self, storage_key: str, bucket: str):
 
     if img is None:
         raise ValueError(f"Failed to decode image at storage_key={storage_key}")
+
+    time.sleep(PROCESSING_DELAY_SECONDS)
 
     # --- your actual OpenCV processing goes here ---
     processed = cv2.GaussianBlur(src=img, ksize=(51, 51), sigmaX=0)  # placeholder

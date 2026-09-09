@@ -7,8 +7,7 @@ requires-python = ">=3.14"
 dependencies = [
     "celery>=5.6.3",
     "minio>=7.2.20",
-    "opencv-python>=5.0.0.93",
+    "opencv-python-headless>=5.0.0.93",
     "pydantic>=2.13.5",
     "pydantic-settings>=2.15.0",
-    "redis>=8.1.0",
 ]

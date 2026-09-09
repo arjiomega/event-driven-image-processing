@@ -14,10 +14,6 @@ class Settings(BaseSettings):
         ...,
         validation_alias="CELERY_BROKER_URL",
     )
-    celery_result_backend: str = Field(
-        ...,
-        validation_alias="CELERY_RESULT_BACKEND",
-    )
 
     s3_bucket_name: str = Field(
         ...,

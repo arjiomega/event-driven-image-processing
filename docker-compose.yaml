@@ -1,6 +1,5 @@
 services:
 
-
   minio:
     image: minio/minio
     container_name: minio
@@ -53,41 +52,19 @@ services:
       timeout: 30s
       retries: 3
 
-
-  postgres:
-    image: postgres:18
-    container_name: postgres
-    ports:
-      - "${POSTGRES_PORT}:5432"
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      PGDATA: /var/lib/postgresql/data/pgdata
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  redis:
-    image: redis:7
-    container_name: redis
-    ports:
-      - "${REDIS_PORT}:6379"
-
   frontend:
     container_name: frontend
     build:
       context: ./app
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: http://localhost:${BACKEND_PORT}
+        NEXT_PUBLIC_API_URL: http://backend:${BACKEND_PORT}
     ports:
       - "3000:80"
     depends_on:
       - backend
+    profiles:
+      - include_frontend
 
   backend:
     container_name: backend
@@ -97,7 +74,7 @@ services:
     ports:
       - "${BACKEND_PORT}:8000"
     environment:
-      CORS_ORIGINS: '["http://localhost:3000", "http://192.168.1.62:3000"]'
+      CORS_ORIGINS: '["http://localhost:3000"]'
       S3_BUCKET_NAME: raw-uploads
       S3_PUBLIC_ENDPOINT: localhost:${MINIO_API_PORT}
       S3_INTERNAL_ENDPOINT: http://minio:9000
@@ -107,7 +84,6 @@ services:
       S3_REQUIRE_TLS: ${S3_REQUIRE_TLS}
       IS_PROXY_REQUIRED: ${IS_PROXY_REQUIRED}
     depends_on:
-      - postgres
       - minio
     volumes:
       - ./backend/app:/app/app
@@ -125,6 +101,7 @@ services:
       ]
 
   worker:
+    container_name: worker
     build:
       context: ./worker
       dockerfile: Dockerfile
@@ -135,7 +112,6 @@ services:
         condition: service_healthy
     environment:
       CELERY_BROKER_URL: amqp://guest:guest@rabbitmq:5672
-      CELERY_RESULT_BACKEND: redis://redis:6379/0
       S3_BUCKET_NAME: raw-uploads
       S3_PUBLIC_ENDPOINT: localhost:${MINIO_API_PORT}
       S3_INTERNAL_ENDPOINT: http://minio:9000
@@ -146,6 +122,7 @@ services:
       IS_PROXY_REQUIRED: ${IS_PROXY_REQUIRED}
 
   consumer:
+    container_name: consumer
     build:
       context: ./events
       dockerfile: Dockerfile
@@ -163,5 +140,4 @@ services:
 
 
 volumes:
-  postgres_data:
   minio-volume:

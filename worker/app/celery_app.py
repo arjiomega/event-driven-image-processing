@@ -7,8 +7,10 @@ settings = get_settings()
 celery_app = Celery(
     "worker",
     broker=settings.celery_broker_url,
-    backend=settings.celery_result_backend,
 )
 
-# celery_app.autodiscover_tasks(["app.tasks"], related_name="image_processing")
+celery_app.conf.update(
+    task_ignore_result=True,
+)
+
 import app.tasks.image_processing  # noqa: F401

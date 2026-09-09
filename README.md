@@ -14,10 +14,14 @@ This was a deliberate choice to practice a decoupled, storage-triggered architec
 ## Architecture
 ![Architecture Image](./Event-Driven%20Image%20Processing%20Service%20Architecture.png)
 
+## Running the project
 
+**Full stack, including the containerized frontend:**
+```bash
+docker compose --profile include_frontend up -d --build
+```
 
-
-
-raw-uploads/       ← incoming files before processing
-processed-output/  ← results after Celery finishes
-(optional) quarantine/ or failed/  ← files that failed processing, for debugging
+**Backend services only** — if you'd rather run the frontend yourself (e.g. `npm run dev` for hot reload during development), add the required env var to `.env` first, then:
+```bash
+docker compose up -d --build
+```
